@@ -1,0 +1,14 @@
+SAMPLE:
+        - SRR12649393_GSM4781330_isi-unwounded_replicate_1_Arabidopsis_thaliana_RNA-Seq
+        - SRR12649394_GSM4781331_isi-unwounded_replicate_2_Arabidopsis_thaliana_RNA-Seq
+        - SRR12649395_GSM4781332_isi-unwounded_replicate_3_Arabidopsis_thaliana_RNA-Seq
+        - SRR12649396_GSM4781333_isi-wounded_replicate_1_Arabidopsis_thaliana_RNA-Seq
+        - SRR12649397_GSM4781334_isi-wounded_replicate_2_Arabidopsis_thaliana_RNA-Seq
+        - SRR12649398_GSM4781335_isi-wounded_replicate_3_Arabidopsis_thaliana_RNA-Seq
+        - SRR12649399_GSM4781336_WT-unwounded_replicate_1_Arabidopsis_thaliana_RNA-Seq
+        - SRR12649400_GSM4781337_WT-unwounded_replicate_2_Arabidopsis_thaliana_RNA-Seq 
+        - SRR12649401_GSM4781338_WT-unwounded_replicate_3_Arabidopsis_thaliana_RNA-Seq
+        - SRR12649402_GSM4781339_WT-wounded_replicate_1_Arabidopsis_thaliana_RNA-Seq
+        - SRR12649403_GSM4781340_WT-wounded_replicate_2_Arabidopsis_thaliana_RNA-Seq
+        - SRR12649404_GSM4781341_WT-wounded_replicate_3_Arabidopsis_thaliana_RNA-Seq
+REF: "/Users/dariakilina/GitHub/RNAseq_projects/ref/Wound_Signaling_Arabidopsis/Arabidopsis_thaliana.TAIR10.cdna.all.fa.gz"
