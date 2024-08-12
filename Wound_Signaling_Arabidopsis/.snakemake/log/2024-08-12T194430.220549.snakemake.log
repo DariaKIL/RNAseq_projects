@@ -1,0 +1,36 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job               count
+--------------  -------
+all                   1
+kallisto_index        1
+kallisto_quant        6
+total                 8
+
+Select jobs to execute...
+Execute 1 jobs...
+
+[Mon Aug 12 19:44:30 2024]
+localrule kallisto_index:
+    input: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/ref/Arabidopsis_thaliana.TAIR10.cdna.all.fa.gz
+    output: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx
+    jobid: 2
+    reason: Missing output files: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx
+    resources: tmpdir=/var/folders/q_/mx5m8r393bq5_rcy1wlmybsh0000gn/T
+
+Terminating processes on user request, this might take some time.
+[Mon Aug 12 19:44:36 2024]
+Error in rule kallisto_index:
+    jobid: 2
+    input: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/ref/Arabidopsis_thaliana.TAIR10.cdna.all.fa.gz
+    output: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx
+    shell:
+        kallisto index -i /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/ref/Arabidopsis_thaliana.TAIR10.cdna.all.fa.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Complete log: .snakemake/log/2024-08-12T194430.220549.snakemake.log
+WorkflowError:
+At least one job did not complete successfully.

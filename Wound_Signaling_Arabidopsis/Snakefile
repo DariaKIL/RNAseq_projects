@@ -1,0 +1,24 @@
+configfile: "/Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/config.yaml"
+
+rule all:
+    input: 
+        expand("/Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/{sample}", sample=config["SAMPLE"]),
+    output: touch(".done")
+
+rule kallisto_index:
+    input:
+        reference=config["REF"]
+    output:
+        index="/Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx",
+    shell:
+        "kallisto index -i {output.index} {input.reference}"
+
+rule kallisto_quant:
+    input:
+        index="/Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx",
+        sample="/Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/{sample}.fastq.gz"
+    threads: 1
+    output:
+        directory("/Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/{sample}")
+    shell:
+        "kallisto quant -i {input.index} -o {output} -t {threads} --single -l 200 -s 30 {input.sample}"

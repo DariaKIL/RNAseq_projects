@@ -1,0 +1,11 @@
+Building DAG of jobs...
+MissingInputException in rule all in file /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/Snakefile, line 3:
+Missing input files for rule all:
+    output: .done
+    affected files:
+        /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649396_GSM4781333_isi-wounded_replicate_1_Arabidopsis_thaliana_RNA-Seq
+        /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649394_GSM4781331_isi-unwounded_replicate_2_Arabidopsis_thaliana_RNA-Seq
+        /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649397_GSM4781334_isi-wounded_replicate_2_Arabidopsis_thaliana_RNA-Seq
+        /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649393_GSM4781330_isi-unwounded_replicate_1_Arabidopsis_thaliana_RNA-Seq
+        /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649395_GSM4781332_isi-unwounded_replicate_3_Arabidopsis_thaliana_RNA-Seq
+        /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649398_GSM4781335_isi-wounded_replicate_3_Arabidopsis_thaliana_RNA-Seq

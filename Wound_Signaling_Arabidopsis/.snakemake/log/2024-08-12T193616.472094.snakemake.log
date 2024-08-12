@@ -1,0 +1,7 @@
+Building DAG of jobs...
+MissingInputException in rule kallisto_quant in file /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/Snakefile, line 16:
+Missing input files for rule kallisto_quant:
+    output: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649393_GSM4781330_isi-unwounded_replicate_1_Arabidopsis_thaliana_RNA-Seq
+    wildcards: sample=SRR12649393_GSM4781330_isi-unwounded_replicate_1_Arabidopsis_thaliana_RNA-Seq
+    affected files:
+        /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649393_GSM4781330_isi-unwounded_replicate_1_Arabidopsis_thaliana_RNA-Seq.fastq.gz
