@@ -2,7 +2,6 @@
 
 # List of SRR IDs
 samples=(
-"SRR12649400"
 "SRR12649401"
 "SRR12649399"
 "SRR12649403"

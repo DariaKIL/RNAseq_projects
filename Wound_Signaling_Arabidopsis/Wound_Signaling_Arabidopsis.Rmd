@@ -1,0 +1,335 @@
+---
+title: "Wound_Signaling_Arabidopsis"
+output: html_notebook
+---
+## Transcriptome of 5-week-old Col-0 and isi1-2 distal leaves 13 in untreated controls or upon wounding leave 8##
+Data from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE157938
+	In that study, IMPAIRED SUCROSE INDUCTION 1 (ISI1) was identified as a player in long distance wound signaling in Arabidopsis. To further assess the impact of ISI1 on the wound response, authors tested the transcriptomes of the wounded isi1-2 mutants in comparison with wounded wild type plants, in order to find genes that were deregulated in isi1 loss-of-function mutants.\n
+
+**Two groups of plants:** control (Col-0) and isi-mutant plants (isi1-2) with three biological replicates per group; Distal leaves 13 were collected one hour after wounding leave 8 (in wounded plants) or without any treatment (unwounded plants). Two individual plants were pooled for one replicate; single read design.
+
+Set your working directory with Kallisto results
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "~/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/")
+```
+Checking for required packages and install, if necessary
+```{r}
+library(tidyverse)
+library(tximport)
+library(DESeq2)
+library(pheatmap)
+library(RColorBrewer)
+library(rhdf5)
+library(WGCNA)
+library(clusterProfiler)
+library(org.At.tair.db)
+library(ggridges)
+```
+### Importing Transcript-Level Quantification Data and creating DESeq2 Dataset ###
+```{r}
+samples <- read_tsv("phenotable.tsv", show_col_types = FALSE)
+samples
+```
+```{r}
+files <- file.path(samples$path, "abundance.h5")  # path to abundance files in kallisto dirs
+files
+```
+The data is from Kallisto, a tool for quantifying RNA-seq data at the transcript level.
+	•	tximport: Imports transcript-level quantification data from Kallisto.
+	•	DESeqDataSetFromTximport: Converts the imported data into a DESeq2 dataset, setting up for differential expression analysis.
+	•	ddsTxi: Contains the DESeq2 dataset object which includes the count data, sample metadata, and design formula.
+```{r}
+txi <- tximport(files, type = 'kallisto', txOut = T)
+ddsTxi <- DESeqDataSetFromTximport(txi,
+                                   colData = samples,
+                                   design = ~ genotype*condition) 
+ddsTxi
+```
+**Filter Low-Expression Genes and relevel the genotype Factor**
+The code keeps only those genes where the sum of counts across all samples is at least 10
+'relevel' changes the reference level of the genotype factor to ensures that all comparisons of genotype effects are made relative to the “WT” genotype.
+```{r}
+dds <- ddsTxi[rowSums(counts(ddsTxi)) >= 10,]
+dds$genotype <- relevel(dds$genotype, ref = "WT")
+```
+###  Run Differential Expression Analysis ###
+```{r}
+dds <- DESeq(dds, fitType = 'local')
+dds
+```
+**Variance-stabilizing transformation of data **
+The VST aims to stabilize the variance across the range of mean expression values, making the data more suitable for downstream analyses such as clustering or principal component analysis (PCA).
+blind = FALSE: This argument controls whether the transformation should be performed without accounting for the experimental design. Setting blind = FALSE means that the transformation will use the information from the experimental design (i.e., it will not “blind” to the design), which is often preferred when you are interested in preserving the relationship between conditions in the transformed data.
+fitType = 'local': Specifies the method for estimating the dispersion used in the transformation. The 'local' option fits a local smoothing spline to the dispersion estimates, which can provide a better fit for datasets with varying dispersion values. (it can run without any fit type and set it automatically)
+```{r}
+vsd <- vst(dds, blind = FALSE, fitType = 'local')
+vsd
+```
+Let's look at the results:
+```{r}
+res <- results(dds)
+res 
+```
+	•	Base Mean provides the average expression level.
+	•	Log2 Fold Change indicates how the expression changes between conditions.
+	•	LfcSE gives the variability in the log2 fold change estimate.
+	•	Stat is the Wald statistic used in hypothesis testing.
+	
+And how many of these results are significant?
+```{r}
+res005 <- results(dds, alpha=0.05)
+summary(res005)
+```
+This means that out of 37,465 genes tested, 3,458 were identified as significant with a padj less than 0.05. The remaining genes did not pass this threshold and are considered insignificant.
+
+Let's look on names of our variables:
+```{r}
+resultsNames(dds)
+```
+Intercept = genotypeWT.conditionUW. In this model, the intercept represents the baseline gene expression for the reference levels of both genotype and condition.
+Let's arranged it by log2FoldChange:
+```{r}
+order_indices <- order(-res$log2FoldChange)
+res_sorted <- res[order_indices, ]
+res_sorted
+```
+Visualisation for the first gene
+```{r}
+# Gene counts for a specific gene
+plotCounts(dds, gene="AT1G10430.1", intgroup="genotype")
+plotCounts(dds, gene="AT1G10430.1", intgroup="condition")
+```
+**Volkano plot**
+```{r}
+res %>%
+  as.data.frame %>% 
+  filter(!is.na(log2FoldChange), !is.na(padj), log2FoldChange >= -2.5, log2FoldChange <= 2.5) %>%
+  ggplot(aes(log2FoldChange, -log10(padj), color = padj < 0.05)) +
+  geom_point() +
+  scale_color_manual(values=c("black", "red")) +
+  xlim(c(-2.5, 2.5))
+```
+** PCA plot **
+```{r}
+plotPCA(vsd, intgroup=c("genotype", "condition"))
+```
+Ideally, each group of replicates should cluster together in a PCA plot, reflecting similar gene expression profiles within each group. 
+- **Outlier in the `ISI:UW` Group**: The fact that one replicate from the `ISI:UW` group clusters closer to the `WT:UW` group could suggest that the ISI1 loss-of-function mutation was not fully penetrant or did not manifest as strongly in that particular replicate. As a result, its gene expression profile is more similar to the wild-type unwounded (`WT:UW`) condition rather than to its intended group (`ISI:UW`).
+
+  - This could occur if the mutation in ISI1 is variable in its effect or if there was some technical or biological reason why this replicate did not exhibit the expected mutant phenotype. 
+
+- **Clear Division Between `W` and `UW` Groups**: The distinct separation of the wounded (`W`) and unwounded (`UW`) samples on the PCA plot indicates that the wounding has a strong and consistent effect on gene expression, regardless of genotype. 
+
+** MA plot **
+
+Under a null hypothesis of no differential expression, most genes' log2 fold changes should center tightly around 0. However, genes with higher absolute M values exhibit greater differential expression between conditions. An ideal MA plot will show the majority of genes along M=0 and outliers stretching towards the graph peripheries. 
+```{r}
+plotMA(dds)
+```
+Here the difference in expression of the entire model of differential expression is shown and we see that there are not many differentially expressed genes and some groups are noticeable in the graph. Let's divide this graph by conditions and look at it separately.
+**Wounded VS Unwouned**
+```{r}
+res <- results(dds, contrast=c("condition", "W", "UW"))
+plotMA(res)
+```
+This plot looks more like an ideal MA graph with a large number of differentially expressed genes.
+What about ISI1-mutated VS WT?
+```{r}
+res <- results(dds, contrast=c("genotype", "ISI", "WT"))
+plotMA(res)
+```
+This plot appears to be close with the null hypothesis, and reveals small effect of the genotype.
+**Plot a heatmap of 100 most expressed genes**
+```{r}
+select <- order(rowMeans(counts(dds,normalized=TRUE)),
+                decreasing=TRUE)[1:100]
+df <- as.data.frame(colData(dds)[,c("genotype", "condition")])
+pheatmap(assay(vsd)[select,], 
+         cluster_rows = TRUE, 
+         show_rownames = TRUE, 
+         cluster_cols = TRUE, 
+         annotation_col = df,
+         fontsize_row = 6)  # Adjust fontsize_row to your preference
+```
+We have a distinct separation of the wounded (`W`) and unwounded (`UW`) samples again, which indicates that the wounding has a strong and consistent effect on gene expression, regardless of genotype. 
+
+**Plot of the distance between samples heatmap**
+```{r}
+sampleDists <- dist(t(assay(vsd)))
+sampleDistMatrix <- as.matrix(sampleDists)
+rownames(sampleDistMatrix) <- paste(vsd$genotype, vsd$condition, sep="-")
+colnames(sampleDistMatrix) <- paste(vsd$genotype, vsd$condition, sep="-")
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         color = colors)
+```
+Same separation of the wounded (`W`) and unwounded (`UW`) samples again
+
+### Анализ обогащения ###
+```{r}
+res
+summary(res)
+```
+```{r}
+gene_ids <- rownames(res)
+head(gene_ids, 99)
+```
+**Understanding the Gene Identifier “AT1G76820.1”**
+
+The nomenclature “AT1G76820.1” is commonly used in genomic data to denote gene identifiers in various databases. In this case, it is a nomenclature from the TAIR (The Arabidopsis Information Resource) database. Here is a breakdown of this identifier:
+
+	1.	AT: Indicates that the identifier refers to the plant Arabidopsis thaliana (always specified when referring to Arabidopsis).
+	2.	1: Refers to the chromosome on which the gene is located. In this case, it is the first chromosome.
+	3.	G76820: This is a unique gene number on this chromosome.
+	4.	.1: Version of the gene annotation. In this case, it is the first version of the annotation for this gene. Sometimes, additional versions are indicated as .2, .3, etc., if the annotation has been updated.
+	
+**Filtering out only the significant results**
+```{r}
+sign_results <- res %>%
+  as.data.frame %>%
+  rownames_to_column("gene_name") %>%
+  mutate(gene_name = gsub("\\.\\d+$", "", gene_name)) %>%
+  filter(padj < .05)
+
+sign_results
+```
+Genes that increase and decrease expression are considered separately
+```{r}
+sign_up <- sign_results %>% filter(log2FoldChange > 0)
+sign_dw <- sign_results %>% filter(log2FoldChange < 0)
+```
+**Calculating GO enrichment**
+
+This function performs Gene Ontology (GO) enrichment analysis. It tests whether the genes in your input list are overrepresented in specific GO categories compared to a background gene set.
+The plot will display the top 20 Biological Process (BP) GO terms that are significantly enriched in your list of genes.
+Each dot represents a GO term, with the size and color typically indicating the significance of the enrichment.
+```{r}
+GO_enrich <- enrichGO(sign_up$gene_name, "org.At.tair.db", keyType = "TAIR", ont = "BP")
+plt <- dotplot(GO_enrich, showCategory = 20)
+plt + theme(
+  axis.text.y = element_text(size = 6)
+)
+
+```
+The top GO terms suggest that your gene set is significantly associated with processes related to amino acid metabolism, response to stress signals like jasmonic acid, and various biosynthetic pathways.
+
+**GO enricment table**
+```{r}
+GO_enrich@result
+```
+```{r}
+GO_enrich <- enrichplot::pairwise_termsim(GO_enrich)
+plt <- emapplot(GO_enrich, 
+                repel = TRUE, 
+                showCategory = 12, 
+                cluster.params = list(label_style = list(size = 3)))
+
+plt
+```
+
+```{r}
+goplot(GO_enrich)
+```
+### FGSEA ###
+
+GSEA is a method used in genomics to determine whether a set of genes (a gene set) shows statistically significant, concordant differences between two biological states.
+
+**How It Works?**
+
+	1.	**Ranking Genes:** FGSEA begins by ranking genes based on their association with a particular phenotype or condition. This is often done using metrics such as fold change or t-statistics from differential expression analysis.
+	2.	**Enrichment Score Calculation:** It calculates an enrichment score for each gene set by examining how the genes in the set are distributed within the ranked list. It uses a fast algorithm to estimate the enrichment score, which reflects the concentration of genes from the set at the top or bottom of the ranked list.
+	3.	**Statistical Significance:** FGSEA performs a permutation test to assess the statistical significance of the enrichment scores, providing p-values that indicate whether the observed enrichment is greater than what would be expected by chance.
+
+Downloading .gmt file
+```{r}
+pathway <- fgsea::gmtPathways('wikipathways-20240410-gmt-Arabidopsis_thaliana.gmt')
+```
+
+Creating ranks and a dictionary for translating rank names
+```{r}
+translated_names <- res %>% 
+  as.data.frame() %>% 
+  na.omit() %>%
+  rownames_to_column("gene_name") %>%
+  mutate(gene_name = gsub("\\.\\d+$", "", gene_name)) %>%
+  pull(gene_name) %>% 
+  bitr('TAIR', c("GENENAME", "ENTREZID"), 'org.At.tair.db') %>% 
+  distinct(TAIR, .keep_all = T)
+
+```
+Сreating a rank vector
+```{r}
+ranks_for_gsea <- res %>% 
+  as.data.frame() %>%   
+  na.omit() %>% 
+  arrange(desc(stat)) %>% 
+  rownames_to_column("gene_name") %>%
+  mutate(TAIR = gsub("\\.\\d+$", "", gene_name)) %>% 
+  left_join(translated_names) %>% 
+  mutate(NAME = ifelse(is.na(ENTREZID), TAIR, ENTREZID)) %>% 
+  transmute(NAME, stat) %>% 
+  deframe()
+```
+```{r}
+head(ranks_for_gsea, 100)
+```
+FGSEA calculating
+```{r}
+fgsea_results <- fgsea::fgseaMultilevel(pathway, ranks_for_gsea)
+head(fgsea_results[order(pval), ])
+```
+**GSEA plot for one path**
+
+```{r}
+fgsea::plotEnrichment(pathway[["Seed development%WikiPathways_20240410%WP2279%Arabidopsis thaliana"]], ranks_for_gsea) + labs(title="Seed development")
+```
+Drawing the top 10 most enriched paths from the top and bottom of the ranked list
+```{r}
+topPathwaysUp <- fgsea_results[ES > 0][head(order(pval), n=10), pathway]
+topPathwaysDown <- fgsea_results[ES < 0][head(order(pval), n=10), pathway]
+topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
+fgsea::plotGseaTable(pathway[topPathways], ranks_for_gsea, fgsea_results, 
+                     gseaParam=0.5)
+```
+FGSEA by clusterProfiler
+```{r}
+GO_gsea <- gseGO(ranks_for_gsea, ont = "ALL", 'org.At.tair.db', eps = 0)
+```
+**Ridge plot**
+```{r}
+plt <- ridgeplot(GO_gsea, showCategory = 20)
+plt + theme(
+  axis.text.y = element_text(size = 8)
+)
+```
+Some of the paths can be related to plant wounding and how plants respond to injury or stress:
+
+1. **Transporter Activity**: 
+   - **Active transmembrane transporter activity** and related terms involve the movement of molecules across cell membranes. When a plant is wounded, it may need to transport defensive compounds, signaling molecules, or nutrients to and from the site of injury.
+
+2. **Defense Response to Other Organism**:
+   - This term directly relates to how plants defend themselves against herbivores, pathogens, or other threats that could cause wounding. Plants often initiate defense mechanisms, including the production of secondary metabolites and signaling compounds, in response to wounding.
+
+3. **Protein Modification Process**:
+   - **Protein modification processes** are crucial in the plant's response to wounding. For example, post-translational modifications of proteins can be involved in signaling pathways that activate defense mechanisms.
+
+4. **Binding Activities**:
+   - **Anion binding**, **purine nucleotide binding**, and similar terms may be involved in the recognition and response to stress signals. These binding activities can affect how plants perceive and react to wounding.
+
+5. **Response to Inorganic Substance**:
+   - This could relate to how plants respond to changes in ion concentrations or other inorganic substances released or mobilized during wounding.
+
+6. **Vacuole** and **Chloroplast Envelope**:
+   - Cellular compartments like the vacuole and chloroplast envelope may play roles in the storage and release of compounds related to the wound response. For instance, vacuoles can store defensive compounds or signaling molecules.
+
+7. **Lipid Metabolic Process**:
+   - Lipid metabolism is often involved in the synthesis of signaling molecules like jasmonic acid, which is crucial for the wound response in plants.
+
+8. **Defense and Stress Responses**:
+   - Terms related to **defense responses** and **stress responses** are particularly relevant to wounding. Plants activate various signaling pathways and produce protective compounds in response to physical damage.
+```{r}
+gseaplot(GO_gsea, 1, title = GO_gsea@result$Description[[1]])
+```
+

@@ -2,12 +2,13 @@
 	"n_targets": 48359,
 	"n_bootstraps": 0,
 	"n_processed": 30173649,
-	"n_pseudoaligned": 29119543,
-	"n_unique": 16284662,
+	"n_pseudoaligned": 29119545,
+	"n_unique": 16284664,
 	"p_pseudoaligned": 96.5,
 	"p_unique": 54.0,
-	"kallisto_version": "0.46.1",
-	"index_version": 10,
-	"start_time": "Fri Mar  8 20:47:52 2024",
-	"call": "/home/data/RNAseq_course_1/kallisto/kallisto quant -i ./results/Arab.idx -o ./results/SRR12649393_GSM4781330_isi-unwounded_replicate_1_Arabidopsis_thaliana_RNA-Seq -t 1 --single -l 200 -s 30 /home/data/RNAseq_HW/HW1/SRR12649393_GSM4781330_isi-unwounded_replicate_1_Arabidopsis_thaliana_RNA-Seq.fastq.gz"
+	"kallisto_version": "0.51.0",
+	"index_version": 13,
+	"k-mer length": 31,
+	"start_time": "Tue Aug 13 20:44:15 2024",
+	"call": "kallisto quant -i /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx -o /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649393_1 -t 1 --single -l 200 -s 30 /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649393_1.fastq.gz"
 }

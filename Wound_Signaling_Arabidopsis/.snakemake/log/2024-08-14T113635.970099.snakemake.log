@@ -1,0 +1,107 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job stats:
+job               count
+--------------  -------
+all                   1
+kallisto_quant        6
+total                 7
+
+Select jobs to execute...
+Execute 6 jobs...
+
+[Wed Aug 14 11:36:35 2024]
+localrule kallisto_quant:
+    input: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649400_1.fastq.gz
+    output: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649400_1
+    jobid: 9
+    reason: Updated input files: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649400_1.fastq.gz, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx
+    wildcards: sample=SRR12649400_1
+    resources: tmpdir=/var/folders/q_/mx5m8r393bq5_rcy1wlmybsh0000gn/T
+
+
+[Wed Aug 14 11:36:36 2024]
+localrule kallisto_quant:
+    input: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649404_1.fastq.gz
+    output: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649404_1
+    jobid: 13
+    reason: Updated input files: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649404_1.fastq.gz, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx
+    wildcards: sample=SRR12649404_1
+    resources: tmpdir=/var/folders/q_/mx5m8r393bq5_rcy1wlmybsh0000gn/T
+
+
+[Wed Aug 14 11:36:36 2024]
+localrule kallisto_quant:
+    input: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649401_1.fastq.gz
+    output: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649401_1
+    jobid: 10
+    reason: Updated input files: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649401_1.fastq.gz
+    wildcards: sample=SRR12649401_1
+    resources: tmpdir=/var/folders/q_/mx5m8r393bq5_rcy1wlmybsh0000gn/T
+
+
+[Wed Aug 14 11:36:36 2024]
+localrule kallisto_quant:
+    input: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649402_1.fastq.gz
+    output: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649402_1
+    jobid: 11
+    reason: Updated input files: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649402_1.fastq.gz, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx
+    wildcards: sample=SRR12649402_1
+    resources: tmpdir=/var/folders/q_/mx5m8r393bq5_rcy1wlmybsh0000gn/T
+
+
+[Wed Aug 14 11:36:36 2024]
+localrule kallisto_quant:
+    input: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649403_1.fastq.gz
+    output: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649403_1
+    jobid: 12
+    reason: Updated input files: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649403_1.fastq.gz, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx
+    wildcards: sample=SRR12649403_1
+    resources: tmpdir=/var/folders/q_/mx5m8r393bq5_rcy1wlmybsh0000gn/T
+
+
+[Wed Aug 14 11:36:36 2024]
+localrule kallisto_quant:
+    input: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649399_1.fastq.gz
+    output: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649399_1
+    jobid: 8
+    reason: Updated input files: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649399_1.fastq.gz, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx
+    wildcards: sample=SRR12649399_1
+    resources: tmpdir=/var/folders/q_/mx5m8r393bq5_rcy1wlmybsh0000gn/T
+
+[Wed Aug 14 11:43:10 2024]
+Finished job 10.
+1 of 7 steps (14%) done
+[Wed Aug 14 11:43:13 2024]
+Finished job 8.
+2 of 7 steps (29%) done
+[Wed Aug 14 11:44:06 2024]
+Finished job 9.
+3 of 7 steps (43%) done
+[Wed Aug 14 11:44:13 2024]
+Finished job 13.
+4 of 7 steps (57%) done
+[Wed Aug 14 11:44:19 2024]
+Finished job 11.
+5 of 7 steps (71%) done
+[Wed Aug 14 11:44:47 2024]
+Finished job 12.
+6 of 7 steps (86%) done
+Select jobs to execute...
+Execute 1 jobs...
+
+[Wed Aug 14 11:44:47 2024]
+localrule all:
+    input: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649393_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649394_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649395_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649396_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649397_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649398_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649399_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649400_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649401_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649402_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649403_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649404_1
+    output: .done
+    jobid: 0
+    reason: Input files updated by another job: /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649404_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649399_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649403_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649400_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649401_1, /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649402_1
+    resources: tmpdir=/var/folders/q_/mx5m8r393bq5_rcy1wlmybsh0000gn/T
+
+Touching output file .done.
+[Wed Aug 14 11:44:47 2024]
+Finished job 0.
+7 of 7 steps (100%) done
+Complete log: .snakemake/log/2024-08-14T113635.970099.snakemake.log

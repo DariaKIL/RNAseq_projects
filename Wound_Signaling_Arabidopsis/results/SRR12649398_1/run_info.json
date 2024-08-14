@@ -1,0 +1,14 @@
+{
+	"n_targets": 48359,
+	"n_bootstraps": 0,
+	"n_processed": 29520599,
+	"n_pseudoaligned": 28580026,
+	"n_unique": 15939307,
+	"p_pseudoaligned": 96.8,
+	"p_unique": 54.0,
+	"kallisto_version": "0.51.0",
+	"index_version": 13,
+	"k-mer length": 31,
+	"start_time": "Tue Aug 13 20:44:15 2024",
+	"call": "kallisto quant -i /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/Arab.idx -o /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/results/SRR12649398_1 -t 1 --single -l 200 -s 30 /Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/data/SRR12649398_1.fastq.gz"
+}
