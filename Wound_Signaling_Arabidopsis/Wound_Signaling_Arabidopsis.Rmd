@@ -1,6 +1,8 @@
 ---
 title: "Wound_Signaling_Arabidopsis"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 ## Transcriptome of 5-week-old Col-0 and isi1-2 distal leaves 13 in untreated controls or upon wounding leave 8##
 Data from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE157938
@@ -330,6 +332,91 @@ Some of the paths can be related to plant wounding and how plants respond to inj
 8. **Defense and Stress Responses**:
    - Terms related to **defense responses** and **stress responses** are particularly relevant to wounding. Plants activate various signaling pathways and produce protective compounds in response to physical damage.
 ```{r}
-gseaplot(GO_gsea, 1, title = GO_gsea@result$Description[[1]])
+gseaplot(GO_gsea, 1, title = GO_gsea@result$Description[[2]])
+```
+### WGCNA ###
+```{r}
+datExpr <- t(assay(vsd))
+rownames(datExpr) <- colData(vsd)$sample
+```
+
+Clustering samples
+```{r}
+sampletree <- hclust(dist(datExpr), method = "average")
+plot(sampletree, cex = 0.5)
+```
+```{r}
+# Pick powers for coexpression network construction
+powers <- c(c(1:10), seq(from = 15, to=50, by=5))
+sft <- pickSoftThreshold(datExpr, powerVector = powers, verbose = 5)
+
+# Plot results
+par(mfrow = c(1,2));
+cex1 = 0.9;
+# Scale-free topology fit index as a function of the soft-thresholding power
+plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
+     xlab="Soft Threshold (power)",ylab="Scale Free Topology Model Fit,signed R^2",type="n",
+     main = paste("Scale independence"));
+text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2],
+     labels=powers,cex=cex1,col="red");
+# this line corresponds to using an R^2 cut-off of h
+abline(h=0.90,col="red")
+# Mean connectivity as a function of the soft-thresholding power
+plot(sft$fitIndices[,1], sft$fitIndices[,5],
+     xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",
+     main = paste("Mean connectivity"))
+text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
+```
+Claster dendrogram
+```{r}
+# construct the network
+net <- blockwiseModules(datExpr, power = 7,
+                        TOMType = "unsigned", minModuleSize = 30,
+                        reassignThreshold = 0, mergeCutHeight = 0.25,
+                        numericLabels = TRUE, pamRespectsDendro = FALSE,
+                        saveTOMs = FALSE,
+                        saveTOMFileBase = "yeastTOM",
+                        verbose = 3)
+
+
+
+module_colors <- labels2colors(net$colors)
+
+# Plot the dendrogram and the module colors underneath
+plotDendroAndColors(net$dendrograms[[1]], module_colors[net$blockGenes[[1]]],
+                    "Module colors",
+                    dendroLabels = FALSE, hang = 0.03,
+                    addGuide = TRUE, guideHang = 0.05)
+```
+Module behavior across the dataset
+```{r}
+moduleLabels <- net$colors
+moduleColors <- labels2colors(net$colors)
+
+# Extract module eigengenes
+MEs <- net$MEs
+geneTree <- net$dendrograms[[1]]
+
+MEs0 <- moduleEigengenes(datExpr, moduleColors)$eigengenes
+MEs <- orderMEs(MEs0)
+
+
+# Plot module behavior across the dataset
+MEs %>%
+  as.data.frame() %>% 
+  rownames_to_column("sample") %>% 
+  ggplot(aes(sample, MEblue))+
+  geom_point()+
+  theme_bw()
+```
+Are modules enriched in something?
+```{r}
+yellow_module <- colnames(datExpr)[module_colors=="yellow"] %>% str_replace("_mRNA", "")
+red_module <- colnames(datExpr)[module_colors=="red"] %>% str_replace("_mRNA", "")
+
+# Are modules enriched in something?
+
+GO_enrich <- enrichGO(sign_up$gene_name, "org.At.tair.db", keyType = "TAIR", ont = "BP")
+barplot(GO_enrich)
 ```
 
