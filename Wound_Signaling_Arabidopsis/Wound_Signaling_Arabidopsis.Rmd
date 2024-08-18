@@ -1,7 +1,6 @@
 ---
 title: "Wound_Signaling_Arabidopsis"
 output:
-  pdf_document: default
   html_notebook: default
 ---
 ## Transcriptome of 5-week-old Col-0 and isi1-2 distal leaves 13 in untreated controls or upon wounding leave 8##
