@@ -14,12 +14,12 @@ This project, titled **Wound_Signaling_Arabidopsis**, explores the transcriptomi
 
 ### Study Summary
 
-- **Objective:** To assess the impact of *ISI1* on the wound response by comparing the transcriptomes of wounded *isi1-2* mutants with those of wounded wild-type plants.
+- **Objective:** To assess the impact of *ISI1* on the wound response by comparing the transcriptomes of wounded *ISI1-2* mutants with those of wounded wild-type plants.
 - **Data Source:** The dataset used in this analysis is publicly available and can be accessed through the [NCBI GEO database](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE157938).
 - **Experimental Design:**
   - **Conditions:** 
-    1. *WT* - control / *isi1-2* mutant plants
-    2. *W* - wounded plants / *UW* unwounded plants
+    1. WT - control / *ISI1-2* mutant plants
+    2. W - wounded plants / UW unwounded plants
   - **Replicates:** Each group included three biological replicates.
   - **Sampling:** Distal leaves 13 were collected one hour after wounding leaf 8 in wounded plants, or without any treatment in unwounded plants. 
   - **Sequencing:** The study employed a single-read sequencing design.
