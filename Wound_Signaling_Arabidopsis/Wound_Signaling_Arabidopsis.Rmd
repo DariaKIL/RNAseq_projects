@@ -3,9 +3,9 @@ title: "Wound_Signaling_Arabidopsis"
 output:
   html_notebook: default
 ---
-## Transcriptome of 5-week-old Col-0 and isi1-2 distal leaves 13 in untreated controls or upon wounding leave 8##
+## Transcriptome of 5-week-old Col-0 and isi1-2 distal leaves 13 in untreated controls or upon wounding leave 8 ##
 Data from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE157938
-	In that study, IMPAIRED SUCROSE INDUCTION 1 (ISI1) was identified as a player in long distance wound signaling in Arabidopsis. To further assess the impact of ISI1 on the wound response, authors tested the transcriptomes of the wounded isi1-2 mutants in comparison with wounded wild type plants, in order to find genes that were deregulated in isi1 loss-of-function mutants.\n
+	In that study, IMPAIRED SUCROSE INDUCTION 1 (ISI1) was identified as a player in long distance wound signaling in Arabidopsis. To further assess the impact of ISI1 on the wound response, authors tested the transcriptomes of the wounded isi1-2 mutants in comparison with wounded wild type plants, in order to find genes that were deregulated in isi1 loss-of-function mutants
 
 **Two groups of plants:** control (Col-0) and isi-mutant plants (isi1-2) with three biological replicates per group; Distal leaves 13 were collected one hour after wounding leave 8 (in wounded plants) or without any treatment (unwounded plants). Two individual plants were pooled for one replicate; single read design.
 
@@ -102,13 +102,23 @@ plotCounts(dds, gene="AT1G10430.1", intgroup="condition")
 ```
 **Volkano plot**
 ```{r}
-res %>%
-  as.data.frame %>% 
-  filter(!is.na(log2FoldChange), !is.na(padj), log2FoldChange >= -2.5, log2FoldChange <= 2.5) %>%
-  ggplot(aes(log2FoldChange, -log10(padj), color = padj < 0.05)) +
+top_genes <- res %>%
+  as.data.frame() %>%
+  filter(!is.na(log2FoldChange), !is.na(padj), padj < 0.05, log2FoldChange >= -2.5, log2FoldChange <= 2.5) %>%
+  arrange(desc(abs(log2FoldChange))) %>%
+  head(10) %>%
+  mutate(label = rownames(.))  
+
+ggplot(res %>%
+         as.data.frame() %>%
+         filter(!is.na(log2FoldChange), !is.na(padj), log2FoldChange >= -2.5, log2FoldChange <= 2.5),
+       aes(log2FoldChange, -log10(padj), color = padj < 0.05)) +
   geom_point() +
-  scale_color_manual(values=c("black", "red")) +
-  xlim(c(-2.5, 2.5))
+  scale_color_manual(values = c("black", "red")) +
+  xlim(c(-2.5, 2.5)) +
+  geom_text(data = top_genes, aes(label = label), size = 2, vjust = -1, hjust = 1) +  
+  theme_minimal() +
+  labs(color = "Adjusted p-value")
 ```
 ** PCA plot **
 ```{r}
