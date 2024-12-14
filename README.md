@@ -30,7 +30,7 @@ The detailed results, including plots and interpretations, are available at the 
 
 ## Project 2: Micro-RNA Prediction
 
-This project focuses on predicting important microRNAs (miRNAs) involved in the development of disease, specifically Acute Respiratory Distress Syndrome (ARDS), by analyzing miRNA and mRNA data from patients with ARDS. The data was sourced from the article [“T cell dysfunction in elderly ARDS patients based on miRNA and mRNA integration analysis”] (https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2024.1368446/full). The objective is to identify miRNAs that might play a critical role in the pathogenesis and severity of ARDS.
+This project focuses on predicting important microRNAs (miRNAs) involved in the development of disease, specifically Acute Respiratory Distress Syndrome (ARDS), by analyzing miRNA and mRNA data from patients with ARDS. The data was sourced from the article [“T cell dysfunction in elderly ARDS patients based on miRNA and mRNA integration analysis”](https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2024.1368446/full). The objective is to identify miRNAs that might play a critical role in the pathogenesis and severity of ARDS.
 
 **Background**
 
@@ -41,7 +41,7 @@ Acute Respiratory Distress Syndrome (ARDS) is a life-threatening condition that 
 This project processes the sequencing data from ARDS patients and healthy donors, using the following approach:
 	1.	Data Processing:
 	•	Raw sequencing data (FASTQ format) from 49 files were processed using a Snakemake pipeline.
-	•	The pipeline uses STAR for aligning RNA-seq data and [HTSeq] (https://htseq.readthedocs.io/en/latest/) for further analysis
+	•	The pipeline uses STAR for aligning RNA-seq data and [HTSeq](https://htseq.readthedocs.io/en/latest/) for further analysis
 	2.	Modeling:
 	•	After pre-processing and normalization, machine learning models were trained to predict important miRNAs involved in ARDS.
 	•	Models such as Support Vector Machines (SVM), Nearest Shrunken Centroids (NSC), and others were applied to classify and predict miRNAs.
