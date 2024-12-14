@@ -39,26 +39,26 @@ Acute Respiratory Distress Syndrome (ARDS) is a life-threatening condition that 
 **Project Workflow**
 
 This project processes the sequencing data from ARDS patients and healthy donors, using the following approach:
-	1.	Data Processing:
-	•	Raw sequencing data (FASTQ format) from 49 files were processed using a Snakemake pipeline.
-	•	The pipeline uses STAR for aligning RNA-seq data and [HTSeq](https://htseq.readthedocs.io/en/latest/) for further analysis
-	2.	Modeling:
-	•	After pre-processing and normalization, machine learning models were trained to predict important miRNAs involved in ARDS.
-	•	Models such as Support Vector Machines (SVM), Nearest Shrunken Centroids (NSC), and others were applied to classify and predict miRNAs.
-	•	The trained models were compared using the MLSeq R package to assess their effectiveness in predicting important miRNAs.
-	•	Evaluation metrics (accuracy, sensitivity, specificity) were used to select the best performing model.
+1. Data Processing:
+- Raw sequencing data (FASTQ format) from 49 files were processed using a Snakemake pipeline.
+- The pipeline uses STAR for aligning RNA-seq data and [HTSeq](https://htseq.readthedocs.io/en/latest/) for further analysis
+2. Modeling:
+- After pre-processing and normalization, machine learning models were trained to predict important miRNAs involved in ARDS.
+- Models such as Support Vector Machines (SVM), Nearest Shrunken Centroids (NSC), and others were applied to classify and predict miRNAs.
+- The trained models were compared using the MLSeq R package to assess their effectiveness in predicting important miRNAs.
+- Evaluation metrics (accuracy, sensitivity, specificity) were used to select the best performing model.
 
 **Requirements**
-	1.	Snakemake: A workflow management system for data analysis.
-	2.	STAR: RNA-seq aligner for genome-based alignment.
-	3.	HTSeq: Python package for analysis of high-throughput sequencing data
-	4.	R: For model training and evaluation, including the MLSeq package.
+1. Snakemake: A workflow management system for data analysis.
+2. STAR: RNA-seq aligner for genome-based alignment.
+3. HTSeq: Python package for analysis of high-throughput sequencing data
+4. R: For model training and evaluation, including the MLSeq package.
  
 **Model Evaluation Results**
 
 After evaluating several models using cross-validation, NSC (Nearest Shrunken Centroids) was identified as the best-performing model for predicting important miRNAs in ARDS.
 Key Metrics:
-	•	Accuracy: 94.12%
-	•	Sensitivity: 81.82%
-	•	Specificity: 100.00%
+- Accuracy: 94.12%
+- Sensitivity: 81.82%
+- Specificity: 100.00%
 
