@@ -1,0 +1,12 @@
+# config.yaml
+
+SAMPLE:
+	SRR26050650.fastq 
+	SRR26050651.fastq 
+	SRR26050652.fastq 
+	SRR26050653.fastq
+	SRR26050654.fastq 
+	SRR26050655.fastq 
+
+REF: "./reference/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"
+GFF: "./reference/Homo_sapiens.GRCh38.113.chr.gtf.gz"

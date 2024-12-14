@@ -1,0 +1,223 @@
+---
+title: "MLSeq Notebook"
+output: html_notebook
+---
+
+
+```{r}
+#BiocManager::install("MLSeq")
+library(MLSeq)
+library(tximport)
+library(tidyverse)
+library(DESeq2)
+set.seed(1111)
+```
+
+```{r}
+setwd("/Users/dariakilina/GitHub/RNAseq_projects/micro-RNA")
+counts_dir = "./counts/"
+counts_files = list.files(counts_dir, pattern = "*.tsv")
+counts_files %>% head
+```
+
+tibble() is used to create a data frame-like object in R. Defining the condition column based on a pattern matching logic applied to the filenames.
+The sample_table must include:
+	•	fileName: The names of the count files.
+	•	condition: The experimental condition associated with each sample (e.g., "A - affected" or "H-healthy").
+```{r}
+sample_table = tibble(fileName = counts_files,
+                      sampleName = counts_files,
+                      condition = ifelse(str_detect(fileName, "A[0-9]+"), "A", "H") %>% factor(levels = c("H", "A")))
+sample_table %>% head
+```
+This code creates a DESeqDataSet object for RNA-seq data analysis using DESeq2. The DESeqDataSetFromHTSeqCount function is used to prepare count data (obtained from HTSeq-count or similar tools) for differential expression analysis with DESeq2.
+design = ~ condition, comparing groups "A" vs. "H"
+```{r}
+ddsHTSeq <- DESeqDataSetFromHTSeqCount(sampleTable = sample_table,
+                                       directory = counts_dir,
+                                       design= ~ condition)
+ddsHTSeq
+```
+Extracts raw count data from the DESeq2 object (ddsHTSeq) created earlier using DESeqDataSetFromHTSeqCount.
+This raw count data contains gene expression counts for all genes across all samples.
+```{r}
+count_data = counts(ddsHTSeq)
+count_data %>% str
+```
+Calculates the variance across samples (columns) for each gene (rows) and sorts the calculated variances in descending order, so the most variable genes are at the top of the list.
+```{r}
+vars <- sort(apply(count_data, 1, var, na.rm = TRUE), decreasing = TRUE)
+vars %>% head
+```
+
+Selects the first 100 genes (by name) with the highest variance from the sorted vars.These genes are considered the most hypervariable, making them potentially interesting for downstream statistical analysis.
+```{r}
+data <- count_data[names(vars)[1:100], ]
+data %>% head
+```
+Uses the sample_table (previously defined) and selects the condition column.
+transmute() creates a new tibble/dataframe that contains only the condition column.
+```{r}
+class = sample_table %>% transmute(condition)
+class %>% str
+table(class$condition)
+```
+
+Calculates 30% of the number of columns (samples) in the data matrix.
+ncol(data): Number of columns (samples) in data.
+ceiling() ensures that the value is rounded up to the nearest whole number.
+This number (nTest) will determine how many samples (or subsets of genes) will be randomly selected.
+```{r}
+nTest <- ceiling(ncol(data) * 0.3)
+nTest
+```
+Randomly samples nTest column indices from the total number of columns in data.
+This is likely to randomize which subset of samples is used for downstream analysis.
+ind: Indices of randomly sampled columns (representing samples).
+```{r}
+ind <- sample(ncol(data), nTest, FALSE)
+ind
+```
+
+Split the dataset into training and testing sets: Based on randomly selected indices (ind) from the data. And adding +1 ensures that zero counts do not interfere with statistical analysis
+
+Split the class labels into training and testing subsets corresponding to data.train and data.test.
+```{r}
+data.train <- as.matrix(data[ ,-ind] + 1)
+data.test <- as.matrix(data[ ,ind] + 1)
+classtr <- class[-ind, ]
+classts <- class[ind, ]
+```
+
+Сreate a DESeqDataSet objects (train and test) from a count matrix and sample metadata.
+• data.train and data.test are numeric matrices where the rows are genes and the columns are samples.
+• classtr and classts contain information about which groups the samples belong to
+```{r}
+data.trainS4 = DESeqDataSetFromMatrix(countData = data.train, colData = classtr,
+design = formula(~condition))
+data.testS4 = DESeqDataSetFromMatrix(countData = data.test, colData = classts,
+design = formula(~condition))
+```
+
+###Nearest shrunken 
+How NSC Works
+	1.	Centroids Calculation:
+	•	For each class (e.g., “healthy” vs. “affected”), it calculates the average value (centroid) of each feature (e.g., gene expression levels).
+	2.	Shrinkage:
+	•	The algorithm shrinks (reduces) the values of the centroids toward zero.
+	•	Features with small differences between classes (which are likely uninformative) are reduced to exactly zero.
+	•	This acts as a built-in feature selection mechanism, keeping only the most relevant features.
+	3.	Classification:
+	•	For a new sample, the algorithm computes the distance between the sample’s features and the shrunken centroids of each class.
+	•	The sample is assigned to the class with the nearest centroid.
+	
+	method = "pam": NSC method (Prediction Analysis for Microarrays)
+```{r}
+fit.NSC <- classify(data = data.trainS4, method = "pam",
+preProcessing = "deseq-vst", ref = "H", tuneLength = 10,
+control = trainControl(method = "repeatedcv", number = 5,
+repeats = 10, classProbs = TRUE))
+show(fit.NSC)
+```
+Show the results of training the model, including final hyperparameter settings and performance on training data.
+```{r}
+trained(fit.NSC)
+```
+
+
+Сross-validation parameters for two different types of classifiers: continuous (for methods that work with continuous data) and discrete (for methods that work with discrete or categorical data)
+```{r}
+ctrl.continuous <- trainControl(method = "repeatedcv", number = 5, repeats = 10, classProbs = TRUE)
+ctrl.discrete <- discreteControl(method = "repeatedcv", number = 5, repeats = 10,
+tuneLength = 10)
+```
+This code trains and compares multiple classifiers to determine which one classifies data better with cross-validation params.
+```{r}
+# availableMethods()
+```
+
+The SVM algorithm works by finding the optimal hyperplane (a decision boundary) that best separates the data into different classes. In two dimensions, this is a line, while in higher dimensions, it’s a hyperplane.
+	•	The idea is to find the hyperplane that maximizes the margin, which is the distance between the nearest data points of each class (called support vectors).
+	Support vectors are the data points that are closest to the hyperplane and help define the margin. These points are critical in constructing the optimal hyperplane.
+package ‘kernlab' is needed
+
+```{r}
+fit.svm <- classify(data = data.trainS4, method = "svmRadial",
+preProcessing = "deseq-vst", ref = "H", tuneLength = 10,
+control = ctrl.continuous)
+fit.svm
+```
+*Discrete classifiers*
+PLDA (Penalized Linear Discriminant Analysis):
+Concept: PLDA is an extension of traditional Linear Discriminant Analysis (LDA) that incorporates regularization to prevent overfitting, especially when the number of features is large relative to the number of samples.
+PLDA2 (Penalized Linear Discriminant Analysis with Two-class):
+Concept: PLDA2 is a variant of PLDA designed for two-class classification problems, where it applies the same penalization but with a focus on binary classification.
+ NBLDA (Naive Bayes Linear Discriminant Analysis):
+Concept: NBLDA combines aspects of both Naive Bayes (NB) and Linear Discriminant Analysis (LDA). It assumes that features are conditionally independent given the class (like Naive Bayes), but uses a linear decision boundary (like LDA). NBLDA makes use of the simplicity of Naive Bayes’ assumption of feature independence and combines it with the ability of LDA to discriminate between classes through a linear decision boundary.
+```{r}
+fit.plda <- classify(data = data.trainS4, method = "PLDA", normalize = "deseq",
+ref = "H", control = ctrl.discrete)
+fit.plda2 <- classify(data = data.trainS4, method = "PLDA2", normalize = "deseq",
+ref = "H", control = ctrl.discrete)
+fit.nblda <- classify(data = data.trainS4, method = "NBLDA", normalize = "deseq",
+ref = "H", control = ctrl.discrete)
+fit.plda2
+```
+```{r}
+models <- list(
+  SVM = fit.svm,
+  NSC = fit.NSC,
+  PLDA = fit.plda,
+  PLDA2 = fit.plda2,
+  NBLDA = fit.nblda
+)
+```
+
+Graphs showing how the performance of a model varies with the number of features or tuning parameters used.
+```{r}
+sapply(models, plot) #don't work for nblda
+```
+
+Comparison of models
+```{r}
+extract_metric <- function(model, metric_name) {
+  output <- capture.output(model)
+  metric_line <- grep(metric_name, output, value = TRUE)
+  metric_value <- as.numeric(gsub(paste0(".*", metric_name, "\\(%\\)  :\\s*"), "", metric_line))
+  return(metric_value)
+}
+
+accuracies <- sapply(models, extract_metric, metric_name = "Accuracy")
+sensitivities <- sapply(models, extract_metric, metric_name = "Sensitivity")
+specificities <- sapply(models, extract_metric, metric_name = "Specificity")
+
+df <- data.frame(
+  Accuracy = accuracies,
+  Sensitivity = sensitivities,
+  Specificity = specificities
+)
+
+print(df)
+```
+Check predictions for NSC
+```{r}
+pred.NSC <- predict(fit.NSC, data.testS4) 
+pred.NSC <- relevel(pred.NSC, ref = "H")
+actual <- relevel(classts$condition, ref = "H")
+tbl <- table(Predicted = pred.NSC, Actual = actual)
+confusionMatrix(tbl, positive = "H")
+```
+```{r}
+pred.svm <- relevel(pred.svm, ref = "H")
+actual <- relevel(classts$condition, ref = "H")
+tbl <- table(Predicted = pred.svm, Actual = actual)
+confusionMatrix(tbl, positive = "H")
+```
+
+```{r}
+# Some methods allow selecting markers
+selectedGenes(fit.plda2)
+```
+
+
+

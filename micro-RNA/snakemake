@@ -1,0 +1,55 @@
+configfile: "./config/config.yaml"
+
+SAMPLES = config["SAMPLE"]
+
+rule all:
+  input:
+    count_tsvs = expand("./counts/{sample}.tsv", sample=SAMPLES)
+  output:
+    touch("done")
+
+rule star_index:
+  input:
+    fasta=config["REF"],
+    gtf=config["GFF"]
+  output:
+    directory("./resources/Hs")
+  message:
+    "Creating STAR index"
+  threads: 4
+  params:
+    extra=""
+  log:
+    "./logs/star_index.log"
+  wrapper:
+    "v3.7.0/bio/star/index"
+
+rule star_se:
+  input:
+    # use a list for multiple fastq files for one sample
+    fq="./Reads/{sample}.fastq.gz",
+    # path to STAR reference genome index
+    idx="./resources/Hs"
+  output:
+    # see STAR manual for additional output files
+    aln="./star/pe/{sample}_aligned.bam",
+    log="./logs/pe/{sample}/Log.out",
+    sj="./star/pe/{sample}/SJ.out.tab"
+  log:
+    "./logs/pe/{sample}.log"
+  params:
+    # optional parameters
+    extra="--outSAMtype BAM SortedByCoordinate"
+  threads: 4
+  wrapper:
+    "v3.7.0/bio/star/align"
+
+rule count_reads:
+  input:
+    bam = "./star/pe/{sample}_aligned.bam",
+    gtf = config["GFF"]
+  output:
+    tsv = "./counts/{sample}.tsv"
+  threads: 4
+  shell:
+    "htseq-count -n {threads} -o {output.tsv} {input.bam} {input.gtf}"
