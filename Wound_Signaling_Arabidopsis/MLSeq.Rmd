@@ -2,7 +2,9 @@
 title: "MLSeq Notebook"
 output: html_notebook
 ---
-
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "~/GitHub/RNAseq_projects/micro-RNA/")
+```
 
 ```{r}
 #BiocManager::install("MLSeq")
@@ -53,7 +55,7 @@ vars %>% head
 Selects the first 100 genes (by name) with the highest variance from the sorted vars.These genes are considered the most hypervariable, making them potentially interesting for downstream statistical analysis.
 ```{r}
 data <- count_data[names(vars)[1:100], ]
-data %>% head
+data %>% str
 ```
 Uses the sample_table (previously defined) and selects the condition column.
 transmute() creates a new tibble/dataframe that contains only the condition column.
