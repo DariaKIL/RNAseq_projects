@@ -62,3 +62,4 @@ Key Metrics:
 - Sensitivity: 81.82%
 - Specificity: 100.00%
 
+[Here is notebook](file:///Users/dariakilina/GitHub/RNAseq_projects/Wound_Signaling_Arabidopsis/MLSeq.nb.html)
